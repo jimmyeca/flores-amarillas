@@ -1,0 +1,132 @@
+/* Reset y variables */
+:root{
+  --bg: #0b1020;
+  --card-bg: rgba(255,255,255,0.05);
+  --accent: #ffd84d;
+  --sunflower: #f7c700;
+  --brown: #5b3a1a;
+  --leaf: #2f7a3e;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: radial-gradient(ellipse at 20% 10%, #081023 0%, var(--bg) 40%); color:white;}
+
+/* Scene */
+.scene{
+  position:relative;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  padding:2rem;
+}
+
+/* Canvas full cover */
+#fireworks-canvas{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+}
+
+/* Card central */
+.card{
+  position:relative;
+  z-index:3;
+  text-align:center;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+  border-radius:16px;
+  padding:18px 28px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.06);
+  max-width:420px;
+  margin-bottom: 220px; /* to make room for bouquet */
+}
+
+/* Title and message */
+.title{
+  font-size:1.25rem;
+  margin:0 0 8px;
+  color:var(--accent);
+}
+.message{
+  margin:0 0 12px;
+  opacity:0.95;
+  color:#fff;
+}
+
+/* Button */
+.btn{
+  background: linear-gradient(90deg, #ffd84d, #ffd14a);
+  border:0;
+  padding:10px 16px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+  box-shadow: 0 6px 18px rgba(255,216,77,0.12);
+}
+.btn:active{transform:translateY(1px)}
+
+/* Bouquet container */
+.bouquet{
+  position:absolute;
+  z-index:2;
+  bottom:18px;
+  left:50%;
+  transform:translateX(-50%);
+  width:520px;
+  pointer-events:none;
+}
+
+/* SVG specific styles */
+.svg-bouquet{ width:100%; height:auto; display:block; }
+
+/* stems and leaves */
+.stem{ fill:#2f7a3e; opacity:0.95; transform-origin:center bottom; animation:stem-sway 4s ease-in-out infinite; }
+.leaf{ fill:var(--leaf); opacity:0.95; transform-origin: center; animation:leaf-sway 6s ease-in-out infinite; }
+
+/* petals and centers */
+.petal-shape{ fill:var(--sunflower); stroke: #e6b400; stroke-width:0.6; transform-origin: center; }
+.center{ fill:var(--brown); stroke:#3e2712; stroke-width:1; }
+
+.ribbon{ fill:none; stroke:#c33b8b; stroke-width:4; opacity:0.15; stroke-linecap:round; }
+.ribbon2{ fill:none; stroke:#ffd84d; stroke-width:6; opacity:0.9; stroke-linecap:round; }
+
+/* Petal "pulse" — pequeño movimiento para dar vida */
+.flower .petal-shape{ transform-origin: center; animation:petal-pulse 3.2s ease-in-out infinite; }
+.flower:nth-child(2) .petal-shape{ animation-delay:0.25s }
+.flower:nth-child(3) .petal-shape{ animation-delay:0.5s }
+
+/* Ribbon animation */
+.ribbon, .ribbon2{ transform-origin:center; animation:ribbon-wave 3.8s ease-in-out infinite; }
+
+/* Keyframes */
+@keyframes petal-pulse {
+  0% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.04) rotate(1deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+@keyframes stem-sway {
+  0% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+  100% { transform: rotate(-2deg); }
+}
+@keyframes leaf-sway {
+  0% { transform: translateX(0) rotate(-2deg); }
+  50% { transform: translateX(4px) rotate(2deg); }
+  100% { transform: translateX(0) rotate(-2deg); }
+}
+@keyframes ribbon-wave {
+  0% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-4px) rotate(2deg); }
+  100% { transform: translateY(0) rotate(-2deg); }
+}
+
+/* small responsive */
+@media (max-width:560px){
+  .card{ max-width:92%; padding:14px; margin-bottom: 160px;}
+  .bouquet{ width:360px; bottom:8px; }
+  .title{ font-size:1rem; }
+}

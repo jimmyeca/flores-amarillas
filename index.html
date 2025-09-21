@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ramo de Girasoles ✨💛</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* Reset y variables */
+    :root{
+      --bg: #0b1020;
+      --card-bg: rgba(255,255,255,0.05);
+      --accent: #ffd84d;
+      --sunflower: #f7c700;
+      --brown: #5b3a1a;
+      --leaf: #2f7a3e;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: radial-gradient(ellipse at 20% 10%, #081023 0%, var(--bg) 40%); color:white;}
+
+    /* Scene */
+    .scene{
+      position:relative;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      padding:2rem;
+    }
+
+    /* Canvas full cover */
+    #fireworks-canvas{
+      position:absolute;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+    }
+
+    /* Card central */
+    .card{
+      position:relative;
+      z-index:3;
+      text-align:center;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border-radius:16px;
+      padding:18px 28px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,0.06);
+      max-width:420px;
+      margin-bottom: 220px; /* to make room for bouquet */
+    }
+
+    /* Title and message */
+    .title{
+      font-size:1.25rem;
+      margin:0 0 8px;
+      color:var(--accent);
+    }
+    .message{
+      margin:0 0 12px;
+      opacity:0.95;
+      color:#fff;
+    }
+
+    /* Button */
+    .btn{
+      background: linear-gradient(90deg, #ffd84d, #ffd14a);
+      border:0;
+      padding:10px 16px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+      box-shadow: 0 6px 18px rgba(255,216,77,0.12);
+    }
+    .btn:active{transform:translateY(1px)}
+
+    /* Bouquet container */
+    .bouquet{
+      position:absolute;
+      z-index:2;
+      bottom:18px;
+      left:50%;
+      transform:translateX(-50%);
+      width:520px;
+      pointer-events:none;
+    }
+
+    /* SVG specific styles */
+    .svg-bouquet{ width:100%; height:auto; display:block; }
+
+    /* stems and leaves */
+    .stem{ fill:#2f7a3e; opacity:0.95; transform-origin:center bottom; animation:stem-sway 4s ease-in-out infinite; }
+    .leaf{ fill:var(--leaf); opacity:0.95; transform-origin: center; animation:leaf-sway 6s ease-in-out infinite; }
+
+    /* petals and centers */
+    .petal-shape{ fill:var(--sunflower); stroke: #e6b400; stroke-width:0.6; transform-origin: center; }
+    .center{ fill:var(--brown); stroke:#3e2712; stroke-width:1; }
+
+    .ribbon{ fill:none; stroke:#c33b8b; stroke-width:4; opacity:0.15; stroke-linecap:round; }
+    .ribbon2{ fill:none; stroke:#ffd84d; stroke-width:6; opacity:0.9; stroke-linecap:round; }
+
+    /* Petal "pulse" */
+    .flower .petal-shape{ transform-origin: center; animation:petal-pulse 3.2s ease-in-out infinite; }
+    .flower:nth-child(2) .petal-shape{ animation-delay:0.25s }
+    .flower:nth-child(3) .petal-shape{ animation-delay:0.5s }
+
+    /* Ribbon animation */
+    .ribbon, .ribbon2{ transform-origin:center; animation:ribbon-wave 3.8s ease-in-out infinite; }
+
+    /* Keyframes */
+    @keyframes petal-pulse {
+      0% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.04) rotate(1deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+    @keyframes stem-sway {
+      0% { transform: rotate(-2deg); }
+      50% { transform: rotate(2deg); }
+      100% { transform: rotate(-2deg); }
+    }
+    @keyframes leaf-sway {
+      0% { transform: translateX(0) rotate(-2deg); }
+      50% { transform: translateX(4px) rotate(2deg); }
+      100% { transform: translateX(0) rotate(-2deg); }
+    }
+    @keyframes ribbon-wave {
+      0% { transform: translateY(0) rotate(-2deg); }
+      50% { transform: translateY(-4px) rotate(2deg); }
+      100% { transform: translateY(0) rotate(-2deg); }
+    }
+
+    /* small responsive */
+    @media (max-width:560px){
+      .card{ max-width:92%; padding:14px; margin-bottom: 160px;}
+      .bouquet{ width:360px; bottom:8px; }
+      .title{ font-size:1rem; }
+    }
+
+    /* Cuadro flotante */
+    .mensaje-cuadro {
+      position: fixed;
+      top: 20%;
+      right: -400px; /* empieza oculto */
+      width: 350px;
+      padding: 20px;
+      background: rgba(255, 216, 77, 0.95);
+      color: #0b1020;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+      font-size: 15px;
+      line-height: 1.5;
+      transition: right 0.5s ease;
+      z-index: 10;
+    }
+    .mensaje-cuadro.show {
+      right: 20px; /* se muestra */
+    }
+    .mensaje-cuadro p {
+      margin: 0;
+    }
+    #cerrar-cuadro {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="scene">
+    <!-- Canvas para fuegos artificiales -->
+    <canvas id="fireworks-canvas"></canvas>
+
+    <!-- Mensaje central -->
+    <div class="card">
+      <h1 class="title">Para ti, con todo mi corazón 💌</h1>
+      <p class="message">Eres mi sol en los días nublados. 🌞🌻</p>
+
+      <!-- Botones -->
+      <div style="display:flex; gap:12px; justify-content:center;">
+        <button id="send-emoji" class="btn">Encender fuegos ✨</button>
+        <button id="download-pdf" class="btn">Mensaje 💌</button>
+      </div>
+    </div>
+
+    <!-- Ramo SVG (girasoles) -->
+    <div class="bouquet" aria-hidden="true">
+      <!-- SVG de girasoles -->
+      <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" class="svg-bouquet">
+       <g id="stems" transform="translate(0,90)">
+  <rect x="285" y="250" width="10" height="260" rx="5" class="stem" />
+  <rect x="320" y="230" width="8" height="280" rx="4" class="stem" />
+  <rect x="250" y="240" width="8" height="270" rx="4" class="stem" />
+</g>
+<g id="leaves" transform="translate(0,90)">
+  <path d="M295 350 q40 -30 70 -10 q-40 30 -70 10" class="leaf leaf1" />
+  <path d="M330 370 q-45 -40 -90 -15 q45 40 90 15" class="leaf leaf2" />
+</g>
+<g id="flowers" transform="translate(0,90)">
+  <!-- Flor izquierda -->
+  <g class="flower" transform="translate(240,190) scale(0.9)">
+    <g class="petals">
+      <g class="petal" transform="rotate(0) translate(0,-55)"><ellipse rx="18" ry="36" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(22.5) translate(0,-55)"><ellipse rx="18" ry="36" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(45) translate(0,-55)"><ellipse rx="18" ry="36" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(67.5) translate(0,-55)"><ellipse rx="18" ry="36" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(90) translate(0,-55)"><ellipse rx="18" ry="36" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(112.5) translate(0,-55)"><ellipse rx="18" ry="36" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(135) translate(0,-55)"><ellipse rx="18" ry="36" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(157.5) translate(0,-55)"><ellipse rx="18" ry="36" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(180) translate(0,-55)"><ellipse rx="18" ry="36" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(202.5) translate(0,-55)"><ellipse rx="18" ry="36" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(225) translate(0,-55)"><ellipse rx="18" ry="36" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(247.5) translate(0,-55)"><ellipse rx="18" ry="36" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(270) translate(0,-55)"><ellipse rx="18" ry="36" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(292.5) translate(0,-55)"><ellipse rx="18" ry="36" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(315) translate(0,-55)"><ellipse rx="18" ry="36" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(337.5) translate(0,-55)"><ellipse rx="18" ry="36" class="petal-shape"/></g>
+    </g>
+    <circle cx="0" cy="0" r="28" class="center" />
+  </g>
+  <!-- Flor centro -->
+  <g class="flower" transform="translate(300,150) scale(1)">
+    <g class="petals"> 
+      <g class="petal" transform="rotate(0) translate(0,-65)"><ellipse rx="22" ry="44" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(30) translate(0,-65)"><ellipse rx="22" ry="44" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(60) translate(0,-65)"><ellipse rx="22" ry="44" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(90) translate(0,-65)"><ellipse rx="22" ry="44" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(120) translate(0,-65)"><ellipse rx="22" ry="44" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(150) translate(0,-65)"><ellipse rx="22" ry="44" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(180) translate(0,-65)"><ellipse rx="22" ry="44" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(210) translate(0,-65)"><ellipse rx="22" ry="44" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(240) translate(0,-65)"><ellipse rx="22" ry="44" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(270) translate(0,-65)"><ellipse rx="22" ry="44" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(300) translate(0,-65)"><ellipse rx="22" ry="44" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(330) translate(0,-65)"><ellipse rx="22" ry="44" class="petal-shape"/></g>
+    </g>
+    <circle cx="0" cy="0" r="36" class="center" />
+  </g>
+  <!-- Flor derecha -->
+  <g class="flower" transform="translate(360,210) scale(0.85)">
+    <g class="petals">
+      <g class="petal" transform="rotate(0) translate(0,-48)"><ellipse rx="16" ry="32" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(30) translate(0,-48)"><ellipse rx="16" ry="32" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(60) translate(0,-48)"><ellipse rx="16" ry="32" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(90) translate(0,-48)"><ellipse rx="16" ry="32" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(120) translate(0,-48)"><ellipse rx="16" ry="32" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(150) translate(0,-48)"><ellipse rx="16" ry="32" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(180) translate(0,-48)"><ellipse rx="16" ry="32" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(210) translate(0,-48)"><ellipse rx="16" ry="32" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(240) translate(0,-48)"><ellipse rx="16" ry="32" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(270) translate(0,-48)"><ellipse rx="16" ry="32" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(300) translate(0,-48)"><ellipse rx="16" ry="32" class="petal-shape"/></g>
+      <g class="petal" transform="rotate(330) translate(0,-48)"><ellipse rx="16" ry="32" class="petal-shape"/></g>
+    </g>
+    <circle cx="0" cy="0" r="26" class="center" />
+  </g>
+</g>
+<g transform="translate(0,90)">
+  <path d="M245 430 q60 40 120 0" class="ribbon" />
+  <path d="M245 430 q50 -25 120 0" class="ribbon2" />
+</g>
+
+      </svg>
+    </div>
+  </div>
+
+  <!-- Cuadro de mensaje flotante -->
+  <div id="mensaje-cuadro" class="mensaje-cuadro">
+    <p>
+      Hola mi Celeste bonita, Feliz 21 de Septiembre la verdad sé que sigues enojada, yo quisiera poderte dar flores en persona<br>
+      pero bueno te hago esto, la verdad eres tú la única niña que en verdad me importa,<br>
+      la niña que quisiera tener en mi vida para siempre, eres mi niña de ojitos lindos,<br>
+      esa niña que en verdad llegué a querer mucho,<br>
+      y en verdad solo quisiera poder tener algo contigo porque tú eres la niña que me gusta ❤‍🩹✨
+    </p>
+    <span id="cerrar-cuadro">&times;</span>
+  </div>
+
+  <!-- Script de fuegos y cuadro -->
+  <script src="js/script.js"></script>
+  <script>
+    // Mostrar cuadro al presionar botón "Mensaje"
+    document.getElementById("download-pdf").addEventListener("click", () => {
+      const cuadro = document.getElementById("mensaje-cuadro");
+      cuadro.classList.add("show");
+    });
+
+    // Cerrar con X
+    document.getElementById("cerrar-cuadro").addEventListener("click", () => {
+      const cuadro = document.getElementById("mensaje-cuadro");
+      cuadro.classList.remove("show");
+    });
+  </script>
+</body>
+</html>
